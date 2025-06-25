@@ -1,0 +1,27 @@
+# Python cache ve derleme dosyaları
+__pycache__/
+*.pyc
+
+# MacOS sistem dosyası
+.DS_Store
+
+# Log dosyaları ve klasörleri
+logs/
+
+# Airflow ve Superset metadata, temp, local config dosyaları (örnek)
+airflow.db
+airflow.cfg
+untracked.db
+
+# Jupyter, VSCode, PyCharm gibi IDE temp dosyaları
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volume ve build cache (isteğe bağlı)
+volumes/
+
+# Gereksiz diğer temp dosyalar
+*.log 
