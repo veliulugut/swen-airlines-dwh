@@ -1,8 +1,4 @@
--- =================================================================
--- Swen Airlines DWH - FT (Fact Table) Tabloları (Güncel Şema)
--- =================================================================
 
--- Gerekirse eski tabloları sil
 DROP TABLE IF EXISTS FT_FLIGHT_FUEL CASCADE;
 DROP TABLE IF EXISTS FT_MAINTENANCE_EVENT CASCADE;
 DROP TABLE IF EXISTS FT_PASSENGER_NOTIFICATION CASCADE;
@@ -14,9 +10,7 @@ DROP TABLE IF EXISTS FT_BOOKING CASCADE;
 DROP TABLE IF EXISTS FT_PASSENGER CASCADE;
 DROP TABLE IF EXISTS FT_FLIGHT CASCADE;
 
--- =================================================================
--- FT_FLIGHT
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_FLIGHT (
     flight_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     flight_number VARCHAR NOT NULL,
@@ -40,9 +34,7 @@ CREATE TABLE IF NOT EXISTS FT_FLIGHT (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_PASSENGER
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_PASSENGER (
     passenger_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name VARCHAR NOT NULL,
@@ -60,9 +52,7 @@ CREATE TABLE IF NOT EXISTS FT_PASSENGER (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_BOOKING
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_BOOKING (
     booking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     passenger_id UUID NOT NULL,
@@ -83,9 +73,7 @@ CREATE TABLE IF NOT EXISTS FT_BOOKING (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_BAGGAGE
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_BAGGAGE (
     baggage_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id UUID NOT NULL,
@@ -98,9 +86,7 @@ CREATE TABLE IF NOT EXISTS FT_BAGGAGE (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_CREW_ASSIGNMENT
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_CREW_ASSIGNMENT (
     assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     flight_id UUID NOT NULL,
@@ -115,9 +101,7 @@ CREATE TABLE IF NOT EXISTS FT_CREW_ASSIGNMENT (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_PASSENGER_NOTIFICATION
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_PASSENGER_NOTIFICATION (
     notification_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     passenger_id UUID NOT NULL,
@@ -133,9 +117,7 @@ CREATE TABLE IF NOT EXISTS FT_PASSENGER_NOTIFICATION (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_FLIGHT_INCIDENT
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_FLIGHT_INCIDENT (
     incident_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     flight_id UUID NOT NULL,
@@ -149,9 +131,7 @@ CREATE TABLE IF NOT EXISTS FT_FLIGHT_INCIDENT (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_PASSENGER_FEEDBACK
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_PASSENGER_FEEDBACK (
     feedback_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     passenger_id UUID NOT NULL,
@@ -165,9 +145,7 @@ CREATE TABLE IF NOT EXISTS FT_PASSENGER_FEEDBACK (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_FLIGHT_FUEL
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_FLIGHT_FUEL (
     fuel_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     flight_id UUID NOT NULL,
@@ -180,9 +158,7 @@ CREATE TABLE IF NOT EXISTS FT_FLIGHT_FUEL (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- FT_MAINTENANCE_EVENT
--- =================================================================
+
 CREATE TABLE IF NOT EXISTS FT_MAINTENANCE_EVENT (
     maintenance_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     aircraft_id UUID NOT NULL,
@@ -196,9 +172,7 @@ CREATE TABLE IF NOT EXISTS FT_MAINTENANCE_EVENT (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- Indexes for FT Tables (Performance optimization)
--- =================================================================
+
 
 -- FT_FLIGHT indexes
 CREATE INDEX idx_ft_flight_ingestion_time ON FT_FLIGHT(ingestion_time);
@@ -216,10 +190,10 @@ CREATE INDEX idx_ft_booking_processed ON FT_BOOKING(is_processed);
 CREATE INDEX idx_ft_booking_passenger_id ON FT_BOOKING(passenger_id);
 CREATE INDEX idx_ft_booking_flight_id ON FT_BOOKING(flight_id);
 
--- FT_AIRCRAFT_MAINTENANCE indexes
-CREATE INDEX idx_ft_maintenance_ingestion_time ON FT_AIRCRAFT_MAINTENANCE(ingestion_time);
-CREATE INDEX idx_ft_maintenance_processed ON FT_AIRCRAFT_MAINTENANCE(is_processed);
-CREATE INDEX idx_ft_maintenance_aircraft_id ON FT_AIRCRAFT_MAINTENANCE(aircraft_id);
+-- FT_MAINTENANCE_EVENT indexes
+CREATE INDEX idx_ft_maintenance_ingestion_time ON FT_MAINTENANCE_EVENT(ingestion_time);
+CREATE INDEX idx_ft_maintenance_processed ON FT_MAINTENANCE_EVENT(is_processed);
+CREATE INDEX idx_ft_maintenance_aircraft_id ON FT_MAINTENANCE_EVENT(aircraft_id);
 
 -- FT_CREW_ASSIGNMENT indexes
 CREATE INDEX idx_ft_crew_ingestion_time ON FT_CREW_ASSIGNMENT(ingestion_time);
@@ -230,21 +204,34 @@ CREATE INDEX idx_ft_crew_flight_id ON FT_CREW_ASSIGNMENT(flight_id);
 CREATE INDEX idx_ft_baggage_ingestion_time ON FT_BAGGAGE(ingestion_time);
 CREATE INDEX idx_ft_baggage_processed ON FT_BAGGAGE(is_processed);
 CREATE INDEX idx_ft_baggage_booking_id ON FT_BAGGAGE(booking_id);
-CREATE INDEX idx_ft_baggage_tag ON FT_BAGGAGE(bag_tag);
+-- bag_tag kolonu yok, bu index'i kaldırıyoruz
 
--- FT_CUSTOMER_FEEDBACK indexes
-CREATE INDEX idx_ft_feedback_ingestion_time ON FT_CUSTOMER_FEEDBACK(ingestion_time);
-CREATE INDEX idx_ft_feedback_processed ON FT_CUSTOMER_FEEDBACK(is_processed);
-CREATE INDEX idx_ft_feedback_passenger_id ON FT_CUSTOMER_FEEDBACK(passenger_id);
-CREATE INDEX idx_ft_feedback_flight_id ON FT_CUSTOMER_FEEDBACK(flight_id);
+-- FT_PASSENGER_FEEDBACK indexes
+CREATE INDEX idx_ft_feedback_ingestion_time ON FT_PASSENGER_FEEDBACK(ingestion_time);
+CREATE INDEX idx_ft_feedback_processed ON FT_PASSENGER_FEEDBACK(is_processed);
+CREATE INDEX idx_ft_feedback_passenger_id ON FT_PASSENGER_FEEDBACK(passenger_id);
+CREATE INDEX idx_ft_feedback_flight_id ON FT_PASSENGER_FEEDBACK(flight_id);
 
--- =================================================================
--- Comments for documentation
--- =================================================================
+-- FT_PASSENGER_NOTIFICATION indexes
+CREATE INDEX idx_ft_notification_ingestion_time ON FT_PASSENGER_NOTIFICATION(ingestion_time);
+CREATE INDEX idx_ft_notification_processed ON FT_PASSENGER_NOTIFICATION(is_processed);
+CREATE INDEX idx_ft_notification_passenger_id ON FT_PASSENGER_NOTIFICATION(passenger_id);
+
+-- FT_FLIGHT_INCIDENT indexes
+CREATE INDEX idx_ft_incident_ingestion_time ON FT_FLIGHT_INCIDENT(ingestion_time);
+CREATE INDEX idx_ft_incident_processed ON FT_FLIGHT_INCIDENT(is_processed);
+CREATE INDEX idx_ft_incident_flight_id ON FT_FLIGHT_INCIDENT(flight_id);
+
+-- FT_FLIGHT_FUEL indexes
+CREATE INDEX idx_ft_fuel_ingestion_time ON FT_FLIGHT_FUEL(ingestion_time);
+CREATE INDEX idx_ft_fuel_processed ON FT_FLIGHT_FUEL(is_processed);
+CREATE INDEX idx_ft_fuel_flight_id ON FT_FLIGHT_FUEL(flight_id);
+
+
 COMMENT ON TABLE FT_FLIGHT IS 'Raw flight data from operational systems';
 COMMENT ON TABLE FT_PASSENGER IS 'Raw passenger data from booking and check-in systems';
 COMMENT ON TABLE FT_BOOKING IS 'Raw booking and reservation data';
-COMMENT ON TABLE FT_AIRCRAFT_MAINTENANCE IS 'Raw aircraft maintenance records';
+COMMENT ON TABLE FT_MAINTENANCE_EVENT IS 'Raw aircraft maintenance records';
 COMMENT ON TABLE FT_CREW_ASSIGNMENT IS 'Raw crew assignment and duty records';
 COMMENT ON TABLE FT_BAGGAGE IS 'Raw baggage tracking and handling data';
-COMMENT ON TABLE FT_CUSTOMER_FEEDBACK IS 'Raw customer feedback and survey data';
+COMMENT ON TABLE FT_PASSENGER_FEEDBACK IS 'Raw customer feedback and survey data';
