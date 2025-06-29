@@ -3,4 +3,8 @@ kafka-python==2.0.2
 sqlalchemy>=1.4.36,<2.0
 psycopg2-binary==2.9.9
 Faker==24.8.0
-flake8==7.0.0 
+flake8==7.0.0
+streamlit==1.38.0
+pandas==2.1.4
+plotly==5.17.0
+altair==5.1.2 

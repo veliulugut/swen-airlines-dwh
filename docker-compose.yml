@@ -16,7 +16,7 @@
 # under the License.
 #
 
-# Basic Airflow cluster configuration for CeleryExecutor with Redis and PostgreSQL.
+# Basic Airflow cluster configuration for LocalExecutor with PostgreSQL.
 #
 # WARNING: This configuration is for local development. Do not use it in a production deployment.
 #
@@ -53,10 +53,8 @@ x-airflow-common:
   build: .
   environment:
     &airflow-common-env
-    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -81,8 +79,6 @@ x-airflow-common:
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
-    redis:
-      condition: service_healthy
     postgres:
       condition: service_healthy
 
@@ -95,16 +91,18 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: swen_dwh
+      POSTGRES_MULTIPLE_DATABASES: airflow
+    ports:
+      - "5432:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
       - ./sql/ddl/01_create_ft_tables.sql:/docker-entrypoint-initdb.d/01_create_ft_tables.sql
+      - ./sql/ddl/02_create_airflow_db.sql:/docker-entrypoint-initdb.d/02_create_airflow_db.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "admin"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U admin -d swen_dwh"]
+      interval: 5s
+      timeout: 5s
       retries: 5
-      start_period: 5s
-    restart: unless-stopped
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     environment:
@@ -127,18 +125,6 @@ services:
       - "9092:9092"
     restart: unless-stopped
 
-  redis:
-    image: redis:7.2-bookworm
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 30s
-      retries: 50
-      start_period: 30s
-    restart: unless-stopped
-
   airflow-init:
     build: .
     entrypoint: /bin/bash
@@ -149,10 +135,8 @@ services:
         airflow db init
         airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@airflow.local
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -166,18 +150,16 @@ services:
       - ./consumers:/opt/airflow/consumers
       - ./requirements.txt:/requirements.txt
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
     restart: on-failure
 
   airflow-webserver:
     build: .
     command: webserver
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -191,9 +173,10 @@ services:
       - ./consumers:/opt/airflow/consumers
       - ./requirements.txt:/requirements.txt
     depends_on:
-      - postgres
-      - redis
-      - airflow-init
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -202,10 +185,8 @@ services:
     build: .
     command: scheduler
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -219,35 +200,10 @@ services:
       - ./consumers:/opt/airflow/consumers
       - ./requirements.txt:/requirements.txt
     depends_on:
-      - postgres
-      - redis
-      - airflow-init
-    restart: unless-stopped
-
-  airflow-worker:
-    build: .
-    command: celery worker
-    environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-      AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
-    volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data_gen:/opt/airflow/data_gen
-      - ./consumers:/opt/airflow/consumers
-      - ./requirements.txt:/requirements.txt
-    depends_on:
-      - postgres
-      - redis
-      - airflow-init
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   data-producer:
@@ -255,33 +211,22 @@ services:
     command: python /opt/airflow/data_gen/producer.py
     working_dir: /opt/airflow
     environment:
-      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://admin:admin@postgres/swen_dwh
-      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-      AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
       PYTHONPATH: /opt/airflow
     volumes:
       - ./data_gen:/opt/airflow/data_gen
       - ./requirements.txt:/requirements.txt
     depends_on:
       - kafka
-      - airflow-init
     restart: unless-stopped
 
-  superset:
-    image: apache/superset:4.0.2
-    command: >
-      /bin/sh -c "superset db upgrade && superset fab create-admin --username admin --firstname Admin --lastname User --email admin@superset.local --password admin || true && superset init && superset run -h 0.0.0.0 -p 8088"
+  streamlit-dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
     environment:
-      SUPERSET_SECRET_KEY: 'thisISaSECRET_key'
-      SUPERSET_DATABASE_URI: postgresql+psycopg2://admin:admin@postgres/swen_dwh
+      PYTHONPATH: /app
     ports:
-      - "8088:8088"
+      - "8501:8501"
     depends_on:
       - postgres
     restart: unless-stopped
