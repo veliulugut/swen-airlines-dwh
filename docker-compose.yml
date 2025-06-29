@@ -98,6 +98,16 @@ services:
       - postgres-db-volume:/var/lib/postgresql/data
       - ./sql/ddl/01_create_ft_tables.sql:/docker-entrypoint-initdb.d/01_create_ft_tables.sql
       - ./sql/ddl/02_create_airflow_db.sql:/docker-entrypoint-initdb.d/02_create_airflow_db.sql
+      - ./sql/ddl/fn_truncate_table.sql:/docker-entrypoint-initdb.d/03_fn_truncate_table.sql
+      - ./sql/ddl/job_flight.sql:/docker-entrypoint-initdb.d/04_job_flight.sql
+      - ./sql/ddl/job_passenger.sql:/docker-entrypoint-initdb.d/05_job_passenger.sql
+      - ./sql/ddl/job_booking.sql:/docker-entrypoint-initdb.d/06_job_booking.sql
+      - ./sql/ddl/job_baggage.sql:/docker-entrypoint-initdb.d/07_job_baggage.sql
+      - ./sql/ddl/job_crew_assignment.sql:/docker-entrypoint-initdb.d/08_job_crew_assignment.sql
+      - ./sql/ddl/job_passenger_notification.sql:/docker-entrypoint-initdb.d/09_job_passenger_notification.sql
+      - ./sql/ddl/job_flight_incident.sql:/docker-entrypoint-initdb.d/10_job_flight_incident.sql
+      - ./sql/ddl/job_flight_fuel.sql:/docker-entrypoint-initdb.d/11_job_flight_fuel.sql
+      - ./sql/ddl/job_maintenance_event.sql:/docker-entrypoint-initdb.d/12_job_maintenance_event.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d swen_dwh"]
       interval: 5s
@@ -134,6 +144,7 @@ services:
         pip install -r requirements.txt
         airflow db init
         airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@airflow.local
+        python /opt/airflow/scripts/setup_airflow_connections.py
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
@@ -148,6 +159,7 @@ services:
       - ./plugins:/opt/airflow/plugins
       - ./data_gen:/opt/airflow/data_gen
       - ./consumers:/opt/airflow/consumers
+      - ./scripts:/opt/airflow/scripts
       - ./requirements.txt:/requirements.txt
     depends_on:
       postgres:
@@ -171,6 +183,7 @@ services:
       - ./plugins:/opt/airflow/plugins
       - ./data_gen:/opt/airflow/data_gen
       - ./consumers:/opt/airflow/consumers
+      - ./scripts:/opt/airflow/scripts
       - ./requirements.txt:/requirements.txt
     depends_on:
       postgres:
@@ -198,6 +211,7 @@ services:
       - ./plugins:/opt/airflow/plugins
       - ./data_gen:/opt/airflow/data_gen
       - ./consumers:/opt/airflow/consumers
+      - ./scripts:/opt/airflow/scripts
       - ./requirements.txt:/requirements.txt
     depends_on:
       postgres:

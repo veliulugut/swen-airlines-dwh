@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS FT_FLIGHT_FUEL CASCADE;
 DROP TABLE IF EXISTS FT_MAINTENANCE_EVENT CASCADE;
 DROP TABLE IF EXISTS FT_PASSENGER_NOTIFICATION CASCADE;
@@ -10,6 +9,19 @@ DROP TABLE IF EXISTS FT_BOOKING CASCADE;
 DROP TABLE IF EXISTS FT_PASSENGER CASCADE;
 DROP TABLE IF EXISTS FT_FLIGHT CASCADE;
 
+-- ETL Procedure Log Table (Required for procedures)
+CREATE TABLE IF NOT EXISTS etl_procedure_log (
+    log_id SERIAL PRIMARY KEY,
+    procedure_name VARCHAR(100) NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    source_table VARCHAR(100),
+    target_table VARCHAR(100),
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ended_at TIMESTAMP,
+    error_message TEXT,
+    row_count INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS FT_FLIGHT (
     flight_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -172,6 +184,105 @@ CREATE TABLE IF NOT EXISTS FT_MAINTENANCE_EVENT (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+create table public.str_baggage as(
+SELECT A.*,NOW()::timestamp(0) AS insert_date FROM public.ft_baggage A
+WHERE 1=2);
+
+create table public.tr_baggage as(
+SELECT A.*,NOW()::timestamp(0) AS insert_date FROM public.ft_baggage A
+WHERE 1=2);
+
+create table public.tr_booking as (
+    select b.*, now()::timestamp(0) AS insert_date from ft_booking b
+                                                   where 1=2
+);
+
+create table public.str_booking as (
+    select b.*, now()::timestamp(0) AS insert_date from ft_booking b
+                                                   where 1=2
+);
+
+create table public.str_crew_assignment as(
+    SELECT C.*, NOW()::timestamp(0) AS INSERT_DATE FROM PUBLIC.ft_crew_assignment C
+    WHERE 1=2
+);
+
+create table public.tr_crew_assignment as(
+    SELECT C.*, NOW()::timestamp(0) AS INSERT_DATE FROM PUBLIC.ft_crew_assignment C
+    WHERE 1=2
+);
+
+
+create table public.str_flight as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight F
+    WHERE 1=2
+);
+
+create table public.tr_flight as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight F
+    WHERE 1=2
+);
+
+create table public.str_flight_incident as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight_incident F
+    WHERE 1=2
+);
+
+create table public.tr_flight_incident as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight_incident F
+    WHERE 1=2
+);
+
+create table public.str_flight_fuel as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight_fuel F
+    WHERE 1=2
+);
+
+create table public.tr_flight_fuel as(
+    SELECT F.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_flight_fuel F
+    WHERE 1=2
+);
+
+create table public.str_maintenance_event as(
+    SELECT E.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_maintenance_event E
+    WHERE 1=2
+);
+
+create table public.tr_maintenance_event as(
+    SELECT E.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_maintenance_event E
+    WHERE 1=2
+);
+
+create table public.str_passenger as(
+    SELECT P.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger P
+    WHERE 1=2
+);
+
+create table public.tr_passenger as(
+    SELECT P.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger P
+    WHERE 1=2
+);
+
+create table public.str_passenger_feedback as(
+    SELECT C.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger_feedback C
+    WHERE 1=2
+);
+
+create table public.tr_passenger_feedback as(
+    SELECT C.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger_feedback C
+    WHERE 1=2
+);
+
+create table public.str_passenger_notification as(
+    SELECT A.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger_notification A
+    WHERE 1=2
+);
+
+create table public.tr_passenger_notification as(
+    SELECT A.*, NOW()::timestamp(0) AS INSERT_DATE FROM ft_passenger_notification A
+    WHERE 1=2
+);
+
 
 
 -- FT_FLIGHT indexes
@@ -235,3 +346,50 @@ COMMENT ON TABLE FT_MAINTENANCE_EVENT IS 'Raw aircraft maintenance records';
 COMMENT ON TABLE FT_CREW_ASSIGNMENT IS 'Raw crew assignment and duty records';
 COMMENT ON TABLE FT_BAGGAGE IS 'Raw baggage tracking and handling data';
 COMMENT ON TABLE FT_PASSENGER_FEEDBACK IS 'Raw customer feedback and survey data';
+
+-- =====================================
+-- TR (TRANSACTIONAL REPORTING) TABLES
+-- =====================================
+-- These are reporting views and summary tables built from FT tables
+
+-- Remove old TR views and use actual tables
+DROP VIEW IF EXISTS tr_flight CASCADE;
+DROP VIEW IF EXISTS tr_booking CASCADE;
+DROP VIEW IF EXISTS tr_passenger CASCADE;
+DROP VIEW IF EXISTS tr_crew_assignment CASCADE;
+DROP VIEW IF EXISTS tr_flight_fuel CASCADE;
+DROP VIEW IF EXISTS tr_maintenance_event CASCADE;
+DROP VIEW IF EXISTS tr_baggage CASCADE;
+DROP VIEW IF EXISTS tr_passenger_notification CASCADE;
+DROP VIEW IF EXISTS tr_flight_incident CASCADE;
+
+-- Update existing TR tables to have proper structure
+-- tr_flight already exists as table, just need to ensure it has right columns
+ALTER TABLE tr_flight ADD COLUMN IF NOT EXISTS delay_minutes NUMERIC;
+ALTER TABLE tr_flight ADD COLUMN IF NOT EXISTS is_ontime BOOLEAN;
+ALTER TABLE tr_flight ADD COLUMN IF NOT EXISTS day_of_week INTEGER;
+ALTER TABLE tr_flight ADD COLUMN IF NOT EXISTS departure_hour INTEGER;
+
+-- Update tr_booking table
+ALTER TABLE tr_booking ADD COLUMN IF NOT EXISTS days_since_registration NUMERIC;
+ALTER TABLE tr_booking ADD COLUMN IF NOT EXISTS is_same_day_booking BOOLEAN;
+ALTER TABLE tr_booking ADD COLUMN IF NOT EXISTS price_per_km NUMERIC;
+
+-- Update tr_passenger table  
+ALTER TABLE tr_passenger ADD COLUMN IF NOT EXISTS age INTEGER;
+ALTER TABLE tr_passenger ADD COLUMN IF NOT EXISTS total_flights INTEGER;
+ALTER TABLE tr_passenger ADD COLUMN IF NOT EXISTS total_spent NUMERIC;
+ALTER TABLE tr_passenger ADD COLUMN IF NOT EXISTS days_since_registration NUMERIC;
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_tr_flight_scheduled_departure ON tr_flight(scheduled_departure);
+CREATE INDEX IF NOT EXISTS idx_tr_booking_booking_date ON tr_booking(booking_date);
+CREATE INDEX IF NOT EXISTS idx_tr_passenger_registration_date ON tr_passenger(registration_date);
+CREATE INDEX IF NOT EXISTS idx_tr_crew_shift_start ON tr_crew_assignment(shift_start);
+CREATE INDEX IF NOT EXISTS idx_tr_maintenance_event_time ON tr_maintenance_event(event_time);
+CREATE INDEX IF NOT EXISTS idx_etl_log_procedure ON etl_procedure_log(procedure_name, started_at);
+
+-- Grant permissions
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO public;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO public;
+GRANT INSERT, UPDATE, DELETE ON etl_procedure_log TO public;
