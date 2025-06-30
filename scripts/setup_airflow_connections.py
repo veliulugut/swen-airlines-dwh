@@ -1,62 +1,87 @@
 #!/usr/bin/env python3
 """
-Airflow connection'larını otomatik olarak oluşturan script
+Airflow Connection Setup for Swen Airlines DWH
+This script sets up PostgreSQL connection for DAGs to access swen_dwh database
 """
 
 import subprocess
-import sys
 import time
+import sys
 
-def run_command(command):
-    """Komut çalıştırma ve sonuç kontrolü"""
+def wait_for_airflow():
+    """Wait for Airflow to be ready"""
+    print("🔄 Waiting for Airflow to be ready...")
+    max_retries = 30
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            result = subprocess.run(['airflow', 'connections', 'list'], 
+                                  capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                print("✅ Airflow is ready!")
+                return True
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
+            pass
+        
+        retry_count += 1
+        print(f"⏳ Attempt {retry_count}/{max_retries}: Waiting for Airflow...")
+        time.sleep(5)
+    
+    print("❌ Airflow failed to become ready")
+    return False
+
+def setup_connections():
+    """Set up PostgreSQL connection for Swen DWH"""
+    if not wait_for_airflow():
+        return False
+    
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print("🔗 Setting up PostgreSQL connection for Swen DWH...")
+        
+        # Remove existing connection if exists
+        subprocess.run(['airflow', 'connections', 'delete', 'postgres_swen_dwh'], 
+                      capture_output=True)
+        
+        # Create new connection to swen_dwh database
+        result = subprocess.run([
+            'airflow', 'connections', 'add', 'postgres_swen_dwh',
+            '--conn-type', 'postgres',
+            '--conn-host', 'postgres',
+            '--conn-port', '5432',
+            '--conn-login', 'admin',
+            '--conn-password', 'admin',
+            '--conn-schema', 'swen_dwh'
+        ], capture_output=True, text=True)
+        
         if result.returncode == 0:
-            print(f"✅ Başarılı: {command}")
-            return True
+            print("✅ PostgreSQL connection (postgres_swen_dwh) created successfully!")
+            
+            # Verify connection
+            verify_result = subprocess.run([
+                'airflow', 'connections', 'get', 'postgres_swen_dwh'
+            ], capture_output=True, text=True)
+            
+            if verify_result.returncode == 0:
+                print("✅ Connection verified successfully!")
+                return True
+            else:
+                print(f"⚠️ Connection verification failed: {verify_result.stderr}")
+                return False
         else:
-            print(f"❌ Hata: {command}")
-            print(f"Error: {result.stderr}")
+            print(f"❌ Failed to create connection: {result.stderr}")
             return False
+            
     except Exception as e:
-        print(f"❌ Exception: {command} - {e}")
+        print(f"❌ Error setting up connections: {e}")
         return False
 
-def main():
-    """Main connection setup function"""
-    print("🔧 Airflow PostgreSQL Connection kurulumu başlatılıyor...")
-    
-    # PostgreSQL connection için gerekli bilgiler
-    postgres_conn_id = "postgres_default"
-    postgres_uri = "postgresql://admin:admin@postgres:5432/swen_dwh"
-    
-    # Mevcut connection'ı sil (varsa)
-    delete_command = f"airflow connections delete {postgres_conn_id}"
-    run_command(delete_command)
-    
-    # Yeni PostgreSQL connection oluştur
-    create_command = f"""airflow connections add {postgres_conn_id} \
-        --conn-type postgres \
-        --conn-host postgres \
-        --conn-login admin \
-        --conn-password admin \
-        --conn-schema swen_dwh \
-        --conn-port 5432"""
-    
-    if run_command(create_command):
-        print(f"✅ PostgreSQL connection '{postgres_conn_id}' başarıyla oluşturuldu!")
-    else:
-        print(f"❌ PostgreSQL connection '{postgres_conn_id}' oluşturulamadı!")
-        sys.exit(1)
-    
-    # Connection'ı test et
-    test_command = f"airflow connections test {postgres_conn_id}"
-    if run_command(test_command):
-        print(f"✅ PostgreSQL connection testi başarılı!")
-    else:
-        print(f"⚠️ PostgreSQL connection testi başarısız - ancak devam ediliyor")
-    
-    print("🎉 Airflow connection kurulumu tamamlandı!")
-
 if __name__ == "__main__":
-    main() 
+    print("🚀 Starting Airflow connection setup...")
+    
+    if setup_connections():
+        print("✅ Airflow connection setup completed successfully!")
+        sys.exit(0)
+    else:
+        print("❌ Airflow connection setup failed!")
+        sys.exit(1) 

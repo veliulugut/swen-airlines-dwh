@@ -1,9 +1,6 @@
 from airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from datetime import datetime, timedelta
-import sys
-import os
 
 # Default arguments
 default_args = {
@@ -16,10 +13,7 @@ default_args = {
     'retry_delay': timedelta(minutes=1),
 }
 
-# PostgreSQL connection ID
-POSTGRES_CONN_ID = 'postgres_default'
-
-# Prosedür listesi
+# Procedure list for Swen Airlines DWH
 PROCEDURES = [
     'job_flight',
     'job_passenger', 
@@ -32,29 +26,28 @@ PROCEDURES = [
     'job_maintenance_event'
 ]
 
-# Her prosedür için ayrı DAG oluştur
-for proc_name in PROCEDURES:
-    dag_id = f'realtime_{proc_name}'
+# Create a separate DAG for each procedure with 3-minute interval
+for procedure_name in PROCEDURES:
+    dag_id = f"{procedure_name}_dag"
     
     dag = DAG(
-        dag_id,
+        dag_id=dag_id,
         default_args=default_args,
-        description=f'Her 3 dakikada {proc_name} prosedürünü çalıştırır - Realtime ETL',
+        description=f'Run {procedure_name} procedure every 3 minutes in delta mode',
         schedule_interval=timedelta(minutes=3),
-        start_date=datetime(2024, 1, 1),
+        start_date=datetime(2023, 1, 1),
         catchup=False,
         max_active_runs=1,
-        tags=['realtime', 'procedures', 'etl', 'ft-to-tr']
+        tags=['swen_airlines', 'procedures', 'delta']
     )
     
-    # PostgreSQL procedure task
-    run_procedure = PostgresOperator(
-        task_id=f'run_{proc_name}',
-        postgres_conn_id=POSTGRES_CONN_ID,
-        sql=f"CALL {proc_name}('delta');",
-        dag=dag,
-        pool='default_pool'
+    # Create task for this procedure
+    task = PostgresOperator(
+        task_id=f'run_{procedure_name}',
+        postgres_conn_id='postgres_swen_dwh',  # Updated connection ID
+        sql=f"CALL {procedure_name}('delta');",
+        dag=dag
     )
     
-    # DAG'ı global scope'a ekle
+    # Add to globals so Airflow can discover it
     globals()[dag_id] = dag 

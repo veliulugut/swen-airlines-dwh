@@ -353,15 +353,38 @@ COMMENT ON TABLE FT_PASSENGER_FEEDBACK IS 'Raw customer feedback and survey data
 -- These are reporting views and summary tables built from FT tables
 
 -- Remove old TR views and use actual tables
-DROP VIEW IF EXISTS tr_flight CASCADE;
-DROP VIEW IF EXISTS tr_booking CASCADE;
-DROP VIEW IF EXISTS tr_passenger CASCADE;
-DROP VIEW IF EXISTS tr_crew_assignment CASCADE;
-DROP VIEW IF EXISTS tr_flight_fuel CASCADE;
-DROP VIEW IF EXISTS tr_maintenance_event CASCADE;
-DROP VIEW IF EXISTS tr_baggage CASCADE;
-DROP VIEW IF EXISTS tr_passenger_notification CASCADE;
-DROP VIEW IF EXISTS tr_flight_incident CASCADE;
+-- Note: These might be tables or views, so we handle both cases
+DO $$
+BEGIN
+    -- Check and drop if VIEW exists
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_flight') THEN
+        DROP VIEW tr_flight CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_booking') THEN
+        DROP VIEW tr_booking CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_passenger') THEN
+        DROP VIEW tr_passenger CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_crew_assignment') THEN
+        DROP VIEW tr_crew_assignment CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_flight_fuel') THEN
+        DROP VIEW tr_flight_fuel CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_maintenance_event') THEN
+        DROP VIEW tr_maintenance_event CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_baggage') THEN
+        DROP VIEW tr_baggage CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_passenger_notification') THEN
+        DROP VIEW tr_passenger_notification CASCADE;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'tr_flight_incident') THEN
+        DROP VIEW tr_flight_incident CASCADE;
+    END IF;
+END $$;
 
 -- Update existing TR tables to have proper structure
 -- tr_flight already exists as table, just need to ensure it has right columns
