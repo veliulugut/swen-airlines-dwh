@@ -27,7 +27,7 @@ st.set_page_config(
 # 🎯 Ultra-Modern CSS Design
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
     
     /* Global Styles */
     * {
@@ -35,196 +35,452 @@ st.markdown("""
     }
     
     :root {
-        --primary-bg: #0F172A;
-        --secondary-bg: #1E293B;
-        --accent-color: #6366F1;
-        --accent-secondary: #06B6D4;
-        --text-primary: #F8FAFC;
-        --text-secondary: #94A3B8;
-        --success: #10B981;
-        --warning: #F59E0B;
-        --error: #EF4444;
-        --glass-bg: rgba(15, 23, 42, 0.8);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.3);
+        /* White Theme Color Palette */
+        --primary-bg: #FFFFFF;
+        --secondary-bg: #F8FAFC;
+        --tertiary-bg: #F1F5F9;
+        --card-bg: #FFFFFF;
+        
+        /* Brand Colors */
+        --brand-primary: #2563EB;
+        --brand-secondary: #0EA5E9;
+        --brand-accent: #8B5CF6;
+        --brand-success: #059669;
+        --brand-warning: #D97706;
+        --brand-danger: #DC2626;
+        
+        /* Text Colors */
+        --text-primary: #1E293B;
+        --text-secondary: #64748B;
+        --text-muted: #94A3B8;
+        --text-white: #FFFFFF;
+        
+        /* Border & Shadow */
+        --border-light: #E2E8F0;
+        --border-medium: #CBD5E1;
+        --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        /* Gradient Colors */
+        --gradient-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+        --gradient-success: linear-gradient(135deg, var(--brand-success) 0%, #10B981 100%);
+        --gradient-warning: linear-gradient(135deg, var(--brand-warning) 0%, #F59E0B 100%);
+        --gradient-purple: linear-gradient(135deg, var(--brand-accent) 0%, #A855F7 100%);
     }
     
     /* Main Container */
     .main > div {
-        padding: 1rem 2rem;
-        background: linear-gradient(135deg, var(--primary-bg) 0%, #1e293b 50%, #0f172a 100%);
+        padding: 1.5rem 2rem;
+        background: var(--primary-bg);
         min-height: 100vh;
     }
     
-    /* Glassmorphism Cards */
-    .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
+    /* Enhanced Header Sections */
+    .page-header {
+        background: var(--gradient-primary);
         padding: 2rem;
-        margin: 1rem 0;
+        border-radius: 16px;
+        margin-bottom: 2rem;
         box-shadow: var(--shadow-lg);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
     }
     
-    .glass-card::before {
+    .page-header::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: 1;
     }
     
-    .glass-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.4);
-        border-color: var(--accent-color);
-    }
-    
-    /* Modern Metrics */
-    .metric-container {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
+    .page-header h1 {
+        color: var(--text-white) !important;
+        margin: 0 !important;
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         position: relative;
-        overflow: hidden;
+        z-index: 2;
     }
     
-    .metric-container::after {
+    .page-header .subtitle {
+        color: rgba(255,255,255,0.9) !important;
+        font-size: 1.1rem !important;
+        font-weight: 400 !important;
+        margin-top: 0.5rem !important;
+        position: relative;
+        z-index: 2;
+    }
+    
+         /* Modern Card Design */
+     .metric-card {
+         background: var(--card-bg);
+         border: 1px solid var(--border-light);
+         border-radius: 16px;
+         padding: 1rem;
+         margin: 0.5rem 0;
+         box-shadow: var(--shadow-md);
+         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         position: relative;
+         overflow: hidden;
+         min-height: 120px;
+         height: auto;
+         display: flex;
+         flex-direction: column;
+         justify-content: space-between;
+     }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--brand-primary);
+    }
+    
+    .metric-card::before {
         content: '';
         position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: conic-gradient(from 0deg, transparent, var(--accent-color), transparent);
-        animation: rotate 4s linear infinite;
-        z-index: -1;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        border-radius: 16px 16px 0 0;
     }
     
-    @keyframes rotate {
-        to { transform: rotate(360deg); }
+         .metric-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 0.75rem;
+         gap: 0.75rem;
+     }
+     
+     .metric-icon {
+         font-size: 1.5rem;
+         width: 40px;
+         height: 40px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 10px;
+         background: var(--gradient-primary);
+         color: var(--text-white);
+         box-shadow: var(--shadow-md);
+         flex-shrink: 0;
+     }
+     
+     .metric-title {
+         color: var(--text-secondary);
+         font-size: 0.75rem;
+         font-weight: 600;
+         text-transform: uppercase;
+         letter-spacing: 0.3px;
+         flex: 1;
+         line-height: 1.2;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+     }
+     
+     .metric-value {
+         color: var(--text-primary);
+         font-size: clamp(1.25rem, 4vw, 1.75rem);
+         font-weight: 700;
+         margin-bottom: 0.25rem;
+         font-family: 'Poppins', sans-serif;
+         line-height: 1.1;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+     }
+    
+         .metric-delta {
+         color: var(--brand-success);
+         font-size: 0.7rem;
+         font-weight: 600;
+         display: flex;
+         align-items: center;
+         gap: 0.25rem;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+     }
+     
+     .metric-delta.negative {
+         color: var(--brand-danger);
+     }
+     
+     .metric-delta.neutral {
+         color: var(--text-secondary);
+     }
+    
+         /* Chart Container */
+     .chart-container {
+         background: var(--card-bg);
+         border: 1px solid var(--border-light);
+         border-radius: 16px;
+         padding: 1rem;
+         margin: 0.5rem 0;
+         box-shadow: var(--shadow-md);
+         transition: all 0.3s ease;
+         overflow: hidden;
+     }
+    
+    .chart-container:hover {
+        box-shadow: var(--shadow-lg);
     }
     
-    .metric-container:hover {
-        transform: translateY(-4px);
-        border-color: var(--accent-color);
-    }
+         .chart-title {
+         color: var(--text-primary);
+         font-size: clamp(1rem, 2.5vw, 1.25rem);
+         font-weight: 600;
+         margin-bottom: 0.75rem;
+         padding-bottom: 0.5rem;
+         border-bottom: 2px solid var(--border-light);
+         display: flex;
+         align-items: center;
+         gap: 0.5rem;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+     }
     
-    .metric-title {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-    
-    .metric-value {
-        color: var(--text-primary);
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(45deg, var(--accent-color), var(--accent-secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .metric-delta {
-        color: var(--success);
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    /* Enhanced Sidebar */
+    /* Sidebar Styling */
     .css-1d391kg {
         background: var(--secondary-bg) !important;
-        border-right: 1px solid var(--glass-border) !important;
+        border-right: 1px solid var(--border-medium) !important;
     }
     
-    /* Modern Buttons */
+         /* Sidebar logo container */
+     .sidebar-logo-container {
+         text-align: center;
+         padding: 0.75rem 1rem;
+         border-bottom: 1px solid var(--border-light);
+         margin: 0 -1rem 1.5rem -1rem;
+         background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(14, 165, 233, 0.05));
+         border-radius: 12px;
+     }
+    
+         /* Logo styling for image */
+     .element-container img {
+         border-radius: 12px;
+         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+         transition: all 0.3s ease;
+         animation: float 3s ease-in-out infinite;
+         max-width: 80px;
+         height: auto;
+         object-fit: contain;
+     }
+     
+     .element-container img:hover {
+         transform: scale(1.05);
+         box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+     }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+         .sidebar-title {
+         margin: 0.25rem 0 0 0;
+         font-size: 1.4rem;
+         font-weight: 700;
+         color: var(--text-primary);
+         font-family: 'Poppins', sans-serif;
+         letter-spacing: -0.5px;
+     }
+     
+     .sidebar-subtitle {
+         color: var(--text-secondary);
+         font-size: 0.8rem;
+         margin: 0;
+         font-weight: 500;
+         letter-spacing: 0.3px;
+     }
+    
+    /* Navigation Buttons */
+    .nav-button {
+        width: 100%;
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-light) !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1rem !important;
+        margin: 0.25rem 0 !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        transition: all 0.3s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 0.75rem !important;
+        text-align: left !important;
+    }
+    
+    .nav-button:hover {
+        background: var(--brand-primary) !important;
+        color: var(--text-white) !important;
+        transform: translateX(4px) !important;
+        box-shadow: var(--shadow-md) !important;
+    }
+    
+    .nav-button.active {
+        background: var(--gradient-primary) !important;
+        color: var(--text-white) !important;
+        box-shadow: var(--shadow-lg) !important;
+    }
+    
+    /* Status Indicators */
+    .status-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .status-online { 
+        color: var(--brand-success);
+        border-color: var(--brand-success);
+        background: rgba(5, 150, 105, 0.05);
+    }
+    .status-warning { 
+        color: var(--brand-warning);
+        border-color: var(--brand-warning);
+        background: rgba(217, 119, 6, 0.05);
+    }
+    .status-error { 
+        color: var(--brand-danger);
+        border-color: var(--brand-danger);
+        background: rgba(220, 38, 38, 0.05);
+    }
+    
+    /* Tables */
+    .dataframe {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-light) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: var(--shadow-md) !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .dataframe thead th {
+        background: var(--gradient-primary) !important;
+        color: var(--text-white) !important;
+        font-weight: 600 !important;
+        border: none !important;
+        padding: 1rem 0.75rem !important;
+        text-align: center !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .dataframe tbody td {
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-light) !important;
+        padding: 0.75rem !important;
+        text-align: center !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .dataframe tbody tr:nth-child(even) {
+        background: var(--secondary-bg) !important;
+    }
+    
+    .dataframe tbody tr:hover {
+        background: rgba(37, 99, 235, 0.05) !important;
+        transform: scale(1.01) !important;
+    }
+    
+    /* Buttons */
     .stButton > button {
-        background: linear-gradient(45deg, var(--accent-color), var(--accent-secondary)) !important;
-        color: white !important;
+        background: var(--gradient-primary) !important;
+        color: var(--text-white) !important;
         border: none !important;
         border-radius: 12px !important;
         padding: 0.75rem 1.5rem !important;
         font-weight: 600 !important;
         font-size: 0.875rem !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4) !important;
+        box-shadow: var(--shadow-md) !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
     }
     
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6) !important;
-    }
-    
-    /* Charts Styling */
-    .chart-container {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        box-shadow: var(--shadow-lg);
-    }
-    
-    /* Status Indicators */
-    .status-online { 
-        color: var(--success);
-        text-shadow: 0 0 10px var(--success);
-    }
-    .status-warning { 
-        color: var(--warning);
-        text-shadow: 0 0 10px var(--warning);
-    }
-    .status-error { 
-        color: var(--error);
-        text-shadow: 0 0 10px var(--error);
-    }
-    
-    /* Enhanced Tables */
-    .dataframe {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(20px) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 12px !important;
-        overflow: hidden !important;
         box-shadow: var(--shadow-lg) !important;
     }
     
-    .dataframe thead th {
-        background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary)) !important;
-        color: white !important;
-        font-weight: 600 !important;
-        border: none !important;
-        padding: 1rem !important;
-        text-align: center !important;
+         /* Section Headers */
+     .section-header {
+         display: flex;
+         align-items: center;
+         gap: 0.5rem;
+         margin: 1.5rem 0 0.75rem 0;
+         padding-bottom: 0.5rem;
+         border-bottom: 2px solid var(--border-light);
+     }
+     
+     .section-header h2, .section-header h3 {
+         color: var(--text-primary) !important;
+         margin: 0 !important;
+         font-family: 'Poppins', sans-serif !important;
+         font-weight: 600 !important;
+         font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+     }
+     
+     .section-icon {
+         font-size: clamp(1.25rem, 2vw, 1.5rem);
+         color: var(--brand-primary);
+         flex-shrink: 0;
+     }
+    
+    /* Alert Styles */
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        border-left: 4px solid;
+        font-weight: 500;
     }
     
-    .dataframe tbody td {
-        background: var(--glass-bg) !important;
-        color: var(--text-primary) !important;
-        border: 1px solid var(--glass-border) !important;
-        padding: 0.75rem !important;
-        text-align: center !important;
+    .alert-success {
+        background: rgba(5, 150, 105, 0.1);
+        border-color: var(--brand-success);
+        color: var(--brand-success);
     }
     
-    .dataframe tbody tr:hover {
-        background: rgba(99, 102, 241, 0.1) !important;
-        transform: scale(1.01) !important;
+    .alert-warning {
+        background: rgba(217, 119, 6, 0.1);
+        border-color: var(--brand-warning);
+        color: var(--brand-warning);
+    }
+    
+    .alert-error {
+        background: rgba(220, 38, 38, 0.1);
+        border-color: var(--brand-danger);
+        color: var(--brand-danger);
+    }
+    
+    .alert-info {
+        background: rgba(37, 99, 235, 0.1);
+        border-color: var(--brand-primary);
+        color: var(--brand-primary);
     }
     
     /* Loading Animation */
@@ -237,24 +493,192 @@ st.markdown("""
         50% { opacity: 0.6; }
     }
     
-    /* Title Styling */
-    h1, h2, h3 {
-        color: var(--text-primary) !important;
-        background: linear-gradient(45deg, var(--accent-color), var(--accent-secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .main > div {
-            padding: 0.5rem 1rem;
-        }
-        .metric-container {
-            margin: 0.5rem 0;
-        }
-    }
+         /* Container Overrides */
+     .element-container {
+         margin-bottom: 0 !important;
+     }
+     
+     .stColumn > div {
+         padding: 0 0.25rem !important;
+     }
+     
+     .stColumn:first-child > div {
+         padding-left: 0 !important;
+     }
+     
+     .stColumn:last-child > div {
+         padding-right: 0 !important;
+     }
+     
+     /* Remove default Streamlit gaps */
+     .block-container {
+         padding-top: 1rem !important;
+         padding-bottom: 0 !important;
+         max-width: none !important;
+     }
+     
+     .main .block-container {
+         padding: 1rem !important;
+     }
+     
+     div[data-testid="stVerticalBlock"] > div:nth-child(n) {
+         gap: 0.5rem !important;
+     }
+     
+     /* Responsive Design */
+     @media (max-width: 1200px) {
+         .metric-value {
+             font-size: clamp(1rem, 3vw, 1.5rem);
+         }
+         
+         .metric-title {
+             font-size: 0.7rem;
+         }
+     }
+     
+     @media (max-width: 768px) {
+         .main > div {
+             padding: 0.75rem 1rem;
+         }
+         
+         .metric-card {
+             margin: 0.25rem 0;
+             padding: 0.75rem;
+             min-height: 100px;
+         }
+         
+         .metric-header {
+             margin-bottom: 0.5rem;
+             gap: 0.5rem;
+         }
+         
+         .metric-icon {
+             font-size: 1.25rem;
+             width: 32px;
+             height: 32px;
+         }
+         
+         .metric-value {
+             font-size: clamp(1rem, 5vw, 1.25rem);
+         }
+         
+         .metric-title {
+             font-size: 0.65rem;
+         }
+         
+         .metric-delta {
+             font-size: 0.6rem;
+         }
+         
+         .page-header h1 {
+             font-size: 1.75rem !important;
+         }
+         
+         .page-header .subtitle {
+             font-size: 0.9rem !important;
+         }
+         
+         .chart-container {
+             padding: 0.75rem;
+             margin: 0.5rem 0;
+         }
+         
+                   .stColumn > div {
+              padding: 0 0.125rem !important;
+          }
+          
+          .section-header {
+              margin: 1rem 0 0.5rem 0;
+              gap: 0.375rem;
+              padding-bottom: 0.375rem;
+          }
+          
+          .section-header h2, .section-header h3 {
+              font-size: 0.9rem !important;
+          }
+          
+          .section-icon {
+              font-size: 1rem;
+          }
+          
+          .element-container img {
+              max-width: 60px !important;
+          }
+     }
+     
+     @media (max-width: 480px) {
+         .main > div {
+             padding: 0.5rem;
+         }
+         
+         .metric-card {
+             padding: 0.5rem;
+             margin: 0.125rem 0;
+             min-height: 85px;
+         }
+         
+         .metric-header {
+             flex-direction: row;
+             align-items: center;
+             gap: 0.5rem;
+             margin-bottom: 0.25rem;
+         }
+         
+         .metric-icon {
+             font-size: 1rem;
+             width: 28px;
+             height: 28px;
+         }
+         
+         .metric-title {
+             font-size: 0.6rem;
+             letter-spacing: 0.2px;
+         }
+         
+         .metric-value {
+             font-size: clamp(0.9rem, 6vw, 1.1rem);
+             margin-bottom: 0.125rem;
+         }
+         
+         .metric-delta {
+             font-size: 0.55rem;
+         }
+         
+         .page-header {
+             padding: 1.25rem;
+             margin-bottom: 1rem;
+         }
+         
+         .page-header h1 {
+             font-size: 1.5rem !important;
+         }
+         
+         .page-header .subtitle {
+             font-size: 0.8rem !important;
+         }
+         
+                   .stColumn > div {
+              padding: 0 0.0625rem !important;
+          }
+          
+          .section-header {
+              margin: 0.75rem 0 0.375rem 0;
+              gap: 0.25rem;
+              padding-bottom: 0.25rem;
+          }
+          
+          .section-header h2, .section-header h3 {
+              font-size: 0.8rem !important;
+          }
+          
+          .section-icon {
+              font-size: 0.9rem;
+          }
+          
+          .element-container img {
+              max-width: 50px !important;
+          }
+     }
 </style>
 """, unsafe_allow_html=True)
 
@@ -313,76 +737,99 @@ def execute_query(query):
 # 📊 Modern Chart Creation Functions
 def create_metric_card(title, value, delta=None, icon="📊", color="blue"):
     """Create beautiful animated metric cards"""
-    delta_html = f'<div class="metric-delta">↗ {delta}</div>' if delta else ''
+    # Determine delta styling
+    delta_class = "metric-delta"
+    if delta:
+        if isinstance(delta, str):
+            if delta.startswith('+'):
+                delta_class += ""  # positive (green)
+            elif delta.startswith('-'):
+                delta_class += " negative"  # negative (red)
+            else:
+                delta_class += " neutral"  # neutral (gray)
+        delta_html = f'<div class="{delta_class}">📈 {delta}</div>'
+    else:
+        delta_html = ''
     
     st.markdown(f"""
-    <div class="metric-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <span style="font-size: 2rem;">{icon}</span>
+    <div class="metric-card">
+        <div class="metric-header">
+            <div class="metric-icon">{icon}</div>
             <div class="metric-title">{title}</div>
         </div>
-        <div class="metric-value">{value}</div>
-        {delta_html}
+        <div>
+            <div class="metric-value">{value}</div>
+            {delta_html}
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 def create_modern_chart(data, chart_type, title, **kwargs):
-    """Create beautiful modern charts with dark theme"""
+    """Create beautiful modern charts with white theme"""
     if data.empty:
-        st.info(f"📊 No data available for {title}")
+        st.markdown(f'<div class="alert alert-info">📊 No data available for {title}</div>', unsafe_allow_html=True)
         return
     
     with st.container():
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        st.markdown(f'<div class="chart-title"><span class="section-icon">📊</span>{title}</div>', unsafe_allow_html=True)
         
-        # Chart creation logic
+        # Chart creation logic with modern colors
+        color_palette = ['#2563EB', '#0EA5E9', '#8B5CF6', '#059669', '#D97706', '#DC2626', '#6366F1', '#06B6D4']
+        
         if chart_type == "donut":
-            fig = px.pie(data, **kwargs, hole=0.6, title=title)
+            fig = px.pie(data, **kwargs, hole=0.6, color_discrete_sequence=color_palette)
             fig.update_traces(
                 textfont_size=12,
-                marker=dict(line=dict(color='rgba(255,255,255,0.2)', width=2))
+                marker=dict(line=dict(color='#FFFFFF', width=3))
             )
             
         elif chart_type == "bar":
-            fig = px.bar(data, **kwargs, title=title)
-            fig.update_traces(marker_color=px.colors.qualitative.Set1)
+            fig = px.bar(data, **kwargs, color_discrete_sequence=color_palette)
+            fig.update_traces(marker_line=dict(color='#FFFFFF', width=1))
             
         elif chart_type == "line":
-            fig = px.line(data, **kwargs, title=title, markers=True)
+            fig = px.line(data, **kwargs, markers=True, color_discrete_sequence=color_palette)
             fig.update_traces(line=dict(width=3), marker=dict(size=8))
             
         elif chart_type == "scatter":
-            fig = px.scatter(data, **kwargs, title=title, size_max=25)
+            fig = px.scatter(data, **kwargs, size_max=25, color_discrete_sequence=color_palette)
             
         else:
-            st.warning(f"Chart type '{chart_type}' not supported")
+            st.markdown(f'<div class="alert alert-warning">⚠️ Chart type "{chart_type}" not supported</div>', unsafe_allow_html=True)
             return
         
-        # Apply ultra-modern dark theme
+        # Apply ultra-modern white theme
         fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#F8FAFC", size=12),
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF",
+            font=dict(color="#1E293B", size=12, family="Inter"),
             title=dict(
-                font=dict(size=18, color="#F8FAFC"),
+                text="",  # Remove title since we have custom title
+                font=dict(size=16, color="#1E293B"),
                 x=0.5,
                 xanchor='center'
             ),
             height=400,
-            margin=dict(l=20, r=20, t=60, b=20),
+            margin=dict(l=20, r=20, t=20, b=20),
             showlegend=True,
             legend=dict(
-                bgcolor="rgba(0,0,0,0)",
-                bordercolor="rgba(255,255,255,0.2)",
-                borderwidth=1
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="#E2E8F0",
+                borderwidth=1,
+                font=dict(color="#1E293B")
             ),
             xaxis=dict(
-                gridcolor="rgba(255,255,255,0.1)",
-                zerolinecolor="rgba(255,255,255,0.2)"
+                gridcolor="#F1F5F9",
+                zerolinecolor="#E2E8F0",
+                linecolor="#E2E8F0",
+                tickfont=dict(color="#64748B")
             ),
             yaxis=dict(
-                gridcolor="rgba(255,255,255,0.1)",
-                zerolinecolor="rgba(255,255,255,0.2)"
+                gridcolor="#F1F5F9",
+                zerolinecolor="#E2E8F0",
+                linecolor="#E2E8F0",
+                tickfont=dict(color="#64748B")
             )
         )
         
@@ -393,12 +840,24 @@ def create_modern_chart(data, chart_type, title, **kwargs):
 def render_navigation():
     """Ultra-modern navigation with enhanced UI"""
     with st.sidebar:
-        # Header section
+        # Header section with logo
+        try:
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.image("dashboard/swen_logo.png", use_container_width=True)
+        except:
+            try:
+                # Try alternative path
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.image("swen_logo.png", use_container_width=True)
+            except:
+                # Fallback to emoji if logo file not found
+                st.markdown('<div style="text-align: center; font-size: 3rem; margin-bottom: 0.5rem;">✈️</div>', unsafe_allow_html=True)
+        
         st.markdown("""
-        <div style="text-align: center; padding: 2rem 0 1rem 0;">
-            <div style="font-size: 3rem; margin-bottom: 0.5rem;">✈️</div>
-            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Swen Airlines</h2>
-            <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 0.5rem 0 0 0;">AI-Powered Analytics Platform</p>
+        <div class="sidebar-logo-container" style="margin-top: -1rem;">
+            <h2 class="sidebar-title">Swen Airlines</h2>
         </div>
         """, unsafe_allow_html=True)
         
@@ -407,60 +866,77 @@ def render_navigation():
             selected = option_menu(
                 menu_title=None,
                 options=["🏠 Dashboard", "✈️ Operations", "💰 Revenue", "👤 Passengers", "👨‍✈️ Crew", "🧳 Baggage", "🔧 Aircraft"],
-                icons=["house-fill", "airplane-fill", "cash-coin", "person-fill", "people-fill", "briefcase-fill", "gear-fill"],
+                icons=[""] * 7,  # Empty icons
                 menu_icon="cast",
                 default_index=0,
                 styles={
                     "container": {"padding": "0", "background-color": "transparent"},
-                    "icon": {"color": "#6366F1", "font-size": "16px"}, 
+                    "icon": {"display": "none"},  # Hide left icons completely
                     "nav-link": {
                         "font-size": "14px",
                         "text-align": "left", 
                         "margin": "4px 0",
                         "padding": "12px 16px",
                         "border-radius": "12px",
-                        "background": "rgba(255,255,255,0.05)",
-                        "color": "#F8FAFC",
-                        "border": "1px solid rgba(255,255,255,0.1)",
+                        "background": "#FFFFFF",
+                        "color": "#1E293B",
+                        "border": "1px solid #E2E8F0",
                         "transition": "all 0.3s ease"
                     },
                     "nav-link-selected": {
-                        "background": "linear-gradient(45deg, #6366F1, #06B6D4)",
+                        "background": "linear-gradient(135deg, #2563EB, #0EA5E9)",
                         "color": "white",
-                        "border": "1px solid #6366F1",
-                        "box-shadow": "0 4px 15px rgba(99, 102, 241, 0.4)"
+                        "border": "1px solid #2563EB",
+                        "box-shadow": "0 4px 15px rgba(37, 99, 235, 0.4)"
                     }
                 }
             )
         else:
-            # Fallback navigation
+            # Fallback navigation with modern styling
             selected = st.selectbox(
-                "Navigate to:",
+                "🧭 Navigate to:",
                 ["🏠 Dashboard", "✈️ Operations", "💰 Revenue", "👤 Passengers", "👨‍✈️ Crew", "🧳 Baggage", "🔧 Aircraft"]
             )
         
         # Live system status
-        st.markdown("---")
-        st.markdown("### 📡 System Status")
+        st.markdown('<div style="margin: 2rem 0 1rem 0;"><div class="section-header"><span class="section-icon">📡</span><h3>System Status</h3></div></div>', unsafe_allow_html=True)
         
-        col1, col2 = st.columns(2)
-        with col1:
-            create_metric_card("🛫", str(np.random.randint(15, 35)), "Active", "✈️")
-        with col2:
-            create_metric_card("⚡", "99.8%", "Health", "🟢")
+        # Status cards with better layout
+        st.markdown("""
+        <div class="status-card status-online">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✈️</div>
+            <div style="font-weight: 600;">{} Active Flights</div>
+        </div>
+        """.format(np.random.randint(15, 35)), unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="status-card status-online">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div>
+            <div style="font-weight: 600;">99.8% System Health</div>
+        </div>
+        """, unsafe_allow_html=True)
             
-        # Real-time clock
-        st.markdown("---")
+        # Real-time clock with modern styling
         current_time = datetime.now().strftime("%H:%M:%S UTC")
-        st.markdown(f"**🕐 Live Time:** {current_time}")
+        st.markdown(f"""
+        <div class="status-card" style="border-color: #8B5CF6; background: rgba(139, 92, 246, 0.05);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #8B5CF6;">🕐</div>
+            <div style="font-weight: 600; color: #8B5CF6;">Live Time: {current_time}</div>
+        </div>
+        """, unsafe_allow_html=True)
         
         return selected
 
 # 📱 Dashboard Pages
 def show_main_dashboard():
     """Ultra-modern main dashboard"""
-    st.markdown("# 🎯 Executive Command Center")
-    st.markdown("#### Real-time Business Intelligence Platform")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>🎯 Executive Dashboard</h1>
+        <div class="subtitle">Real-time Business Intelligence</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Hero KPIs
     col1, col2, col3, col4 = st.columns(4)
@@ -481,21 +957,19 @@ def show_main_dashboard():
             FROM tr_flight WHERE DATE(scheduled_departure) = CURRENT_DATE AND actual_departure IS NOT NULL
         """)
         perf = ontime.iloc[0]['perf'] if not ontime.empty and ontime.iloc[0]['perf'] is not None else 0
-        create_metric_card("On-Time %", f"{perf}%", f"{perf-85:+.1f}%", "⏰")
+        create_metric_card("On-Time Performance", f"{perf}%", f"{perf-85:+.1f}%", "⏰")
     
     with col4:
         passengers_today = execute_query("SELECT COUNT(DISTINCT passenger_id) as count FROM tr_booking WHERE DATE(booking_date) = CURRENT_DATE AND is_cancelled = false")
         count = passengers_today.iloc[0]['count'] if not passengers_today.empty else 0
         create_metric_card("Active Passengers", f"{count:,}", f"+{np.random.randint(5,15)}", "👥")
     
-    # Interactive Analytics
-    st.markdown("---")
-    st.markdown("### 📊 Interactive Analytics Center")
+    # Interactive Analytics Section
+    st.markdown('<div class="section-header"><span class="section-icon">📊</span><h2>Interactive Analytics Center</h2></div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 🎯 Flight Status Distribution")
         status_data = execute_query("""
             SELECT flight_status, COUNT(*) as count 
             FROM tr_flight 
@@ -506,7 +980,6 @@ def show_main_dashboard():
             create_modern_chart(status_data, "donut", "Today's Flight Status", values='count', names='flight_status')
     
     with col2:
-        st.markdown("#### 💰 Revenue by Class")
         class_revenue = execute_query("""
             SELECT fare_class, SUM(ticket_price) as revenue
             FROM tr_booking 
@@ -521,7 +994,6 @@ def show_main_dashboard():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 👑 Loyalty Distribution")
         loyalty_data = execute_query("""
             SELECT loyalty_tier, COUNT(*) as count
             FROM tr_passenger 
@@ -532,7 +1004,6 @@ def show_main_dashboard():
             create_modern_chart(loyalty_data, "donut", "Customer Loyalty Tiers", values='count', names='loyalty_tier')
     
     with col2:
-        st.markdown("#### 📈 Daily Revenue Trend")
         daily_revenue = execute_query("""
             SELECT 
                 DATE(booking_date) as date,
@@ -548,8 +1019,13 @@ def show_main_dashboard():
 
 def show_operations_dashboard():
     """Modern flight operations center"""
-    st.markdown("# ✈️ Flight Operations Command Center")
-    st.markdown("#### Real-time Flight Management & Analytics")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>✈️ Flight Operations</h1>
+        <div class="subtitle">Real-time Flight Management & Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Filters
     col1, col2, col3 = st.columns(3)
@@ -609,7 +1085,6 @@ def show_operations_dashboard():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 🎯 Flight Status Analysis")
         status_data = execute_query(f"""
             SELECT flight_status, COUNT(*) as count 
             FROM tr_flight 
@@ -620,7 +1095,6 @@ def show_operations_dashboard():
             create_modern_chart(status_data, "donut", "Flight Status Distribution", values='count', names='flight_status')
     
     with col2:
-        st.markdown("#### 🌍 Airport Performance")
         airport_perf = execute_query(f"""
             SELECT 
                 departure_airport,
@@ -640,8 +1114,13 @@ def show_operations_dashboard():
 
 def show_revenue_dashboard():
     """Advanced revenue analytics"""
-    st.markdown("# 💰 Revenue Analytics & Financial Intelligence")
-    st.markdown("#### Advanced Sales Performance & Profitability Analysis")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>💰 Revenue Analytics</h1>
+        <div class="subtitle">Sales Performance & Financial Intelligence</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Revenue filters
     col1, col2, col3 = st.columns(3)
@@ -699,7 +1178,6 @@ def show_revenue_dashboard():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 💎 Revenue by Service Class")
         class_revenue = execute_query(f"""
             SELECT 
                 b.fare_class,
@@ -716,7 +1194,6 @@ def show_revenue_dashboard():
             create_modern_chart(class_revenue, "bar", "Revenue by Service Class", x='fare_class', y='total_revenue')
     
     with col2:
-        st.markdown("#### 📈 Daily Revenue Trends")
         daily_revenue = execute_query(f"""
             SELECT 
                 DATE(b.booking_date) as booking_date,
@@ -733,8 +1210,13 @@ def show_revenue_dashboard():
 
 def show_passenger_dashboard():
     """Customer analytics and CRM intelligence"""
-    st.markdown("# 👤 Customer Analytics & CRM Intelligence")
-    st.markdown("#### Advanced Passenger Insights & Loyalty Management")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>👤 Customer Analytics</h1>
+        <div class="subtitle">Passenger Insights & Loyalty Management</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Customer KPIs
     col1, col2, col3, col4 = st.columns(4)
@@ -827,8 +1309,13 @@ def show_passenger_dashboard():
 
 def show_crew_dashboard():
     """Workforce management and crew analytics"""
-    st.markdown("# 👨‍✈️ Crew Management & Workforce Intelligence")
-    st.markdown("#### Advanced Human Resource Analytics & Performance Tracking")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>👨‍✈️ Crew Management</h1>
+        <div class="subtitle">Workforce Analytics & Performance Tracking</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Crew analytics
     col1, col2 = st.columns(2)
@@ -856,8 +1343,13 @@ def show_crew_dashboard():
 
 def show_baggage_dashboard():
     """Baggage operations and logistics intelligence"""
-    st.markdown("# 🧳 Baggage Operations & Logistics Intelligence")
-    st.markdown("#### Advanced Baggage Handling & Performance Analytics")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>🧳 Baggage Operations</h1>
+        <div class="subtitle">Baggage Handling & Logistics Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -909,8 +1401,13 @@ def show_baggage_dashboard():
 
 def show_aircraft_dashboard():
     """Fleet management and maintenance intelligence"""
-    st.markdown("# 🛩️ Fleet Management & Maintenance Intelligence")
-    st.markdown("#### Advanced Aircraft Performance & Maintenance Analytics")
+    # Page Header
+    st.markdown("""
+    <div class="page-header">
+        <h1>🛩️ Fleet Management</h1>
+        <div class="subtitle">Aircraft Performance & Maintenance Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
