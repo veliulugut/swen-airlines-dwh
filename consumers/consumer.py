@@ -35,9 +35,9 @@ def get_consumer(topic: str) -> KafkaConsumer:
         topic,
         bootstrap_servers=[KAFKA_BROKER],
         value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-        auto_offset_reset='latest',  # Son 5 dakikalık veriyi almak için latest kullan
+        auto_offset_reset='earliest',  # Tüm mevcut verileri al
         enable_auto_commit=True,
-        group_id=f'{topic}_airflow_consumer_group',
+        group_id=f'{topic}_airflow_consumer_group_{int(time.time())}',
         consumer_timeout_ms=30000  # 30 saniye timeout
     )
 
@@ -105,7 +105,7 @@ def run_kafka_to_postgres_batch():
     for topic, table_name in topic_table_map.items():
         try:
             print(f"[Consumer] {topic} işleniyor...")
-            consume_topic_batch(topic, tables[table_name], timeout_seconds=60)
+            consume_topic_batch(topic, tables[table_name], timeout_seconds=30)
         except Exception as e:
             print(f"[Consumer][ERROR] {topic} işleme hatası: {e}")
     

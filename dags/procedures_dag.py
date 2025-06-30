@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 default_args = {
     'owner': 'swen-airlines',
     'depends_on_past': False,
-    'start_date': datetime(2024, 1, 1),
+    'start_date': datetime.now() - timedelta(minutes=5),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 2,
@@ -35,7 +35,7 @@ for procedure_name in PROCEDURES:
         default_args=default_args,
         description=f'Run {procedure_name} procedure every 3 minutes in delta mode',
         schedule_interval=timedelta(minutes=3),
-        start_date=datetime(2023, 1, 1),
+        start_date=datetime.now() - timedelta(minutes=5),
         catchup=False,
         max_active_runs=1,
         tags=['swen_airlines', 'procedures', 'delta']

@@ -21,7 +21,7 @@ def run_kafka_consumer():
 default_args = {
     'owner': 'swen-airlines',
     'depends_on_past': False,
-    'start_date': datetime(2024, 1, 1),
+    'start_date': datetime.now() - timedelta(minutes=10),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 2,
@@ -33,7 +33,7 @@ dag = DAG(
     default_args=default_args,
     description='Kafka FT verilerini her 5 dakikada bir PostgreSQL FT tablolarına yükler',
     schedule_interval=timedelta(minutes=5),
-    start_date=datetime(2024, 1, 1),
+    start_date=datetime.now() - timedelta(minutes=10),
     catchup=False,
     max_active_runs=1,
     tags=['kafka', 'postgres', 'etl', 'fact-tables']
