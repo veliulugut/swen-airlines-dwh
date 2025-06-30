@@ -1,27 +1,103 @@
 # Python cache ve derleme dosyaları
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+.env.local
+.env.development
+.env.production
 
-# MacOS sistem dosyası
+# MacOS ve Windows sistem dosyaları
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Log dosyaları ve klasörleri
+# Log dosyaları ve klasörleri  
 logs/
+logs/**
+*.log
+*.log.*
+airflow/logs/
+scheduler.log
+dag_processor_manager.log
 
-# Airflow ve Superset metadata, temp, local config dosyaları (örnek)
+# Docker ve Volume dosyaları
+volumes/
+postgres_data/
+.docker-data/
+docker-compose.override.yml
+.dockerignore.local
+
+# Airflow metadata ve konfigürasyon
 airflow.db
 airflow.cfg
 untracked.db
+airflow-webserver.pid
+standalone_admin_password.txt
+webserver_config.py
 
-# Jupyter, VSCode, PyCharm gibi IDE temp dosyaları
+# Database dosyaları ve exports
+*.sql.backup
+*.dump
+*.db
+*.sqlite3
+*.csv.export
+data_exports/
+backups/
+
+# Kafka ve Streaming data temp dosyaları  
+kafka-logs/
+kafka_*
+.kafka/
+streaming_temp/
+
+# IDE ve Editor dosyaları
 .ipynb_checkpoints/
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.settings/
+.pydevproject
 
-# Docker volume ve build cache (isteğe bağlı)
-volumes/
+# Test ve Coverage
+.coverage
+.pytest_cache/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-# Gereksiz diğer temp dosyalar
-*.log 
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb.bak
+
+# Data Science ve ML
+*.pkl
+*.joblib
+*.h5
+*.model
+datasets/
+models/
+experiments/
+
+# Temp ve misc files
+*.tmp
+*.temp
+temp/
+tmp/
+.temp/ 
