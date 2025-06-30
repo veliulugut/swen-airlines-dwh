@@ -1,249 +1,179 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-
-# Basic Airflow cluster configuration for LocalExecutor with PostgreSQL.
-#
-# WARNING: This configuration is for local development. Do not use it in a production deployment.
-#
-# This configuration supports basic configuration using environment variables or an .env file
-# The following variables are supported:
-#
-# AIRFLOW_IMAGE_NAME           - Docker image name used to run Airflow.
-#                                Default: apache/airflow:2.10.0
-# AIRFLOW_UID                  - User ID in Airflow containers
-#                                Default: 50000
-# AIRFLOW_PROJ_DIR             - Base path to which all the files will be volumed.
-#                                Default: .
-# Those configurations are useful mostly in case of standalone testing/running Airflow in test/try-out mode
-#
-# _AIRFLOW_WWW_USER_USERNAME   - Username for the administrator account (if requested).
-#                                Default: airflow
-# _AIRFLOW_WWW_USER_PASSWORD   - Password for the administrator account (if requested).
-#                                Default: airflow
-# _PIP_ADDITIONAL_REQUIREMENTS - Additional PIP requirements to add when starting all containers.
-#                                Use this option ONLY for quick checks. Installing requirements at container
-#                                startup is done EVERY TIME the service is started.
-#                                A better way is to build a custom image or extend the official image
-#                                as described in https://airflow.apache.org/docs/docker-stack/build.html.
-#                                Default: ''
-#
-# Feel free to modify this file to suit your needs.
----
-x-airflow-common:
-  &airflow-common
-  # In order to add custom dependencies or upgrade provider packages you can use your extended image.
-  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
-  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  #image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.0}
-  build: .
-  environment:
-    &airflow-common-env
-    AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
-    AIRFLOW__CORE__FERNET_KEY: ''
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-    AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
-    # yamllint disable rule:line-length
-    # Use simple http server on scheduler for health checks
-    # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
-    # yamllint enable rule:line-length
-    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
-    # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    # The following line can be used to set a custom config file, stored in the local config folder
-    # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
-    # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
-  volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}:0"
-  depends_on:
-    &airflow-common-depends-on
-    postgres:
-      condition: service_healthy
+# Swen Airlines DWH - Otomatik Sistem
+# Gerçek Zamanlı Veri Ambarı ve Analitik Dashboard
 
 version: '3.8'
 
 services:
+  # PostgreSQL Database (swen_dwh + airflow_db)
   postgres:
     image: postgres:13
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: swen_dwh
-      POSTGRES_MULTIPLE_DATABASES: airflow
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
-      - ./sql/ddl/01_create_ft_tables.sql:/docker-entrypoint-initdb.d/01_create_ft_tables.sql
-      - ./sql/ddl/02_create_airflow_db.sql:/docker-entrypoint-initdb.d/02_create_airflow_db.sql
-      - ./sql/ddl/fn_truncate_table.sql:/docker-entrypoint-initdb.d/03_fn_truncate_table.sql
-      - ./sql/ddl/job_flight.sql:/docker-entrypoint-initdb.d/04_job_flight.sql
-      - ./sql/ddl/job_passenger.sql:/docker-entrypoint-initdb.d/05_job_passenger.sql
-      - ./sql/ddl/job_booking.sql:/docker-entrypoint-initdb.d/06_job_booking.sql
-      - ./sql/ddl/job_baggage.sql:/docker-entrypoint-initdb.d/07_job_baggage.sql
-      - ./sql/ddl/job_crew_assignment.sql:/docker-entrypoint-initdb.d/08_job_crew_assignment.sql
-      - ./sql/ddl/job_passenger_notification.sql:/docker-entrypoint-initdb.d/09_job_passenger_notification.sql
-      - ./sql/ddl/job_flight_incident.sql:/docker-entrypoint-initdb.d/10_job_flight_incident.sql
-      - ./sql/ddl/job_flight_fuel.sql:/docker-entrypoint-initdb.d/11_job_flight_fuel.sql
-      - ./sql/ddl/job_maintenance_event.sql:/docker-entrypoint-initdb.d/12_job_maintenance_event.sql
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_MULTIPLE_DATABASES=swen_dwh,airflow_db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d swen_dwh"]
       interval: 5s
       timeout: 5s
       retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/ddl:/docker-entrypoint-initdb.d
+      - ./scripts/create_multiple_dbs.sh:/docker-entrypoint-initdb.d/00_create_multiple_dbs.sh
+    networks:
+      - swen_network
+    restart: unless-stopped
+
+  # Kafka Services
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
+    image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    restart: unless-stopped
+    networks:
+      - swen_network
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.0
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
-    restart: unless-stopped
+    networks:
+      - swen_network
 
-  airflow-init:
+  # Real-time Data Producer (7/24 çalışır)
+  kafka-producer:
     build: .
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        pip install -r requirements.txt
-        airflow db init
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@airflow.local
-        python /opt/airflow/scripts/setup_airflow_connections.py
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-      AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
-    volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data_gen:/opt/airflow/data_gen
-      - ./consumers:/opt/airflow/consumers
-      - ./scripts:/opt/airflow/scripts
-      - ./requirements.txt:/requirements.txt
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: on-failure
-
-  airflow-webserver:
-    build: .
-    command: webserver
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-      AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
-    volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data_gen:/opt/airflow/data_gen
-      - ./consumers:/opt/airflow/consumers
-      - ./scripts:/opt/airflow/scripts
-      - ./requirements.txt:/requirements.txt
-    depends_on:
-      postgres:
-        condition: service_healthy
-      airflow-init:
-        condition: service_completed_successfully
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-
-  airflow-scheduler:
-    build: .
-    command: scheduler
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
-      AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS: 'true'
-    volumes:
-      - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data_gen:/opt/airflow/data_gen
-      - ./consumers:/opt/airflow/consumers
-      - ./scripts:/opt/airflow/scripts
-      - ./requirements.txt:/requirements.txt
-    depends_on:
-      postgres:
-        condition: service_healthy
-      airflow-init:
-        condition: service_completed_successfully
-    restart: unless-stopped
-
-  data-producer:
-    build: .
-    command: python /opt/airflow/data_gen/producer.py
-    working_dir: /opt/airflow
-    environment:
-      PYTHONPATH: /opt/airflow
-    volumes:
-      - ./data_gen:/opt/airflow/data_gen
-      - ./requirements.txt:/requirements.txt
+    command: python data_gen/producer.py
     depends_on:
       - kafka
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - swen_network
     restart: unless-stopped
 
-  streamlit-dashboard:
-    build:
-      context: .
-      dockerfile: dashboard/Dockerfile
+  # Initial Data Loading (bir kez çalışır)
+  data-init:
+    build: .
+    command: >
+      bash -c "
+        echo '🔄 Starting data initialization...' &&
+        python /app/scripts/load_sample_data.py &&
+        python /app/scripts/run_initial_procedures.py &&
+        echo '✅ Data initialization completed!'
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      PYTHONPATH: /app
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - swen_network
+    restart: "no"
+
+  # Airflow Webserver (http://localhost:8080)
+  airflow-webserver:
+    build: .
+    command: >
+      bash -c "
+        echo '🔄 Setting up Airflow...' &&
+        airflow db init &&
+        python /opt/airflow/scripts/setup_airflow_connections.py &&
+        airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@swen.com --password admin &&
+        echo '✅ Airflow setup complete!' &&
+        airflow webserver --port 8080
+      "
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres:5432/airflow_db
+      - AIRFLOW__CORE__FERNET_KEY=ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=temporary_secret_key
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=false
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    ports:
+      - "8080:8080"
+    depends_on:
+      data-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./consumers:/opt/airflow/consumers
+      - ./data_gen:/opt/airflow/data_gen
+    working_dir: /opt/airflow
+    networks:
+      - swen_network
+    restart: unless-stopped
+
+  # Airflow Scheduler (DAG execution)
+  airflow-scheduler:
+    build: .
+    command: >
+      bash -c "
+        echo '⏰ Starting Airflow scheduler...' &&
+        python /opt/airflow/scripts/activate_dags.py &&
+        airflow scheduler
+      "
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres:5432/airflow_db
+      - AIRFLOW__CORE__FERNET_KEY=ZmDfcTF7_60GrrY167zsiPd67pEvs0aGOv2oasOM1Pg=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=temporary_secret_key
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=false
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    depends_on:
+      airflow-webserver:
+        condition: service_started
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./consumers:/opt/airflow/consumers
+      - ./data_gen:/opt/airflow/data_gen
+    working_dir: /opt/airflow
+    networks:
+      - swen_network
+    restart: unless-stopped
+
+  # Analytics Dashboard (http://localhost:8501)
+  streamlit-dashboard:
+    build: .
+    command: >
+      bash -c "
+        echo '🚀 Starting Analytics Dashboard...' &&
+        streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0 --theme.base=dark
+      "
+    environment:
+      - PYTHONPATH=/app
     ports:
       - "8501:8501"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - swen_network
     restart: unless-stopped
 
+networks:
+  swen_network:
+    driver: bridge
+
 volumes:
-  postgres-db-volume:
+  postgres_data:
