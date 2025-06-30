@@ -1,8 +1,8 @@
 # Database Configuration
 POSTGRES_URI = 'postgresql+psycopg2://admin:admin@postgres/swen_dwh'
 
-# Kafka Configuration
-KAFKA_BROKER = 'kafka:9092'
+# Kafka Configuration - Confluent Platform
+KAFKA_BROKER = 'kafka:29092'  # Internal listener için
 KAFKA_TOPIC_FLIGHT = 'ft_flight'
 KAFKA_TOPIC_PASSENGER = 'ft_passenger'
 KAFKA_TOPIC_BOOKING = 'ft_booking'

@@ -9,12 +9,10 @@ import os
 
 # Modern UI components
 try:
-    from streamlit_elements import elements, mui, dashboard, nivo
     from streamlit_option_menu import option_menu
     MODERN_UI_AVAILABLE = True
 except ImportError:
     MODERN_UI_AVAILABLE = False
-    st.warning("🔄 Installing modern UI components... Please refresh after build completes.")
 
 # 🎨 Ultra-Modern Page Configuration
 st.set_page_config(
@@ -892,11 +890,22 @@ def render_navigation():
                 }
             )
         else:
-            # Fallback navigation with modern styling
-            selected = st.selectbox(
-                "🧭 Navigate to:",
-                ["🏠 Dashboard", "✈️ Operations", "💰 Revenue", "👤 Passengers", "👨‍✈️ Crew", "🧳 Baggage", "🔧 Aircraft"]
-            )
+            # Fallback navigation with session state
+            if 'selected_page' not in st.session_state:
+                st.session_state.selected_page = "🏠 Dashboard"
+            
+            options = ["🏠 Dashboard", "✈️ Operations", "💰 Revenue", "👤 Passengers", "👨‍✈️ Crew", "🧳 Baggage", "🔧 Aircraft"]
+            
+            st.markdown("### 🧭 Navigation")
+            
+            # Create buttons for each option
+            for i, option in enumerate(options):
+                button_style = "primary" if st.session_state.selected_page == option else "secondary"
+                if st.button(option, key=f"nav_{i}", use_container_width=True, type=button_style):
+                    st.session_state.selected_page = option
+                    st.rerun()
+            
+            selected = st.session_state.selected_page
         
         # Live system status
         st.markdown('<div style="margin: 2rem 0 1rem 0;"><div class="section-header"><span class="section-icon">📡</span><h3>System Status</h3></div></div>', unsafe_allow_html=True)
