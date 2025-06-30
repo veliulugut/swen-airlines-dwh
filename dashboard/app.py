@@ -120,19 +120,19 @@ st.markdown("""
      .metric-card {
          background: var(--card-bg);
          border: 1px solid var(--border-light);
-         border-radius: 16px;
+        border-radius: 16px;
          padding: 1rem;
          margin: 0.5rem 0;
          box-shadow: var(--shadow-md);
          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-         position: relative;
-         overflow: hidden;
+        position: relative;
+        overflow: hidden;
          min-height: 120px;
          height: auto;
          display: flex;
          flex-direction: column;
          justify-content: space-between;
-     }
+    }
     
     .metric-card:hover {
         transform: translateY(-4px);
@@ -157,8 +157,8 @@ st.markdown("""
          align-items: center;
          margin-bottom: 0.75rem;
          gap: 0.75rem;
-     }
-     
+    }
+    
      .metric-icon {
          font-size: 1.5rem;
          width: 40px;
@@ -171,10 +171,10 @@ st.markdown("""
          color: var(--text-white);
          box-shadow: var(--shadow-md);
          flex-shrink: 0;
-     }
-     
-     .metric-title {
-         color: var(--text-secondary);
+    }
+    
+    .metric-title {
+        color: var(--text-secondary);
          font-size: 0.75rem;
          font-weight: 600;
          text-transform: uppercase;
@@ -184,21 +184,21 @@ st.markdown("""
          overflow: hidden;
          text-overflow: ellipsis;
          white-space: nowrap;
-     }
-     
-     .metric-value {
-         color: var(--text-primary);
+    }
+    
+    .metric-value {
+        color: var(--text-primary);
          font-size: clamp(1.25rem, 4vw, 1.75rem);
-         font-weight: 700;
+        font-weight: 700;
          margin-bottom: 0.25rem;
          font-family: 'Poppins', sans-serif;
          line-height: 1.1;
          overflow: hidden;
          text-overflow: ellipsis;
          white-space: nowrap;
-     }
+    }
     
-         .metric-delta {
+    .metric-delta {
          color: var(--brand-success);
          font-size: 0.7rem;
          font-weight: 600;
@@ -216,7 +216,7 @@ st.markdown("""
      
      .metric-delta.neutral {
          color: var(--text-secondary);
-     }
+    }
     
          /* Chart Container */
      .chart-container {
@@ -521,9 +521,9 @@ st.markdown("""
      
      div[data-testid="stVerticalBlock"] > div:nth-child(n) {
          gap: 0.5rem !important;
-     }
-     
-     /* Responsive Design */
+    }
+    
+    /* Responsive Design */
      @media (max-width: 1200px) {
          .metric-value {
              font-size: clamp(1rem, 3vw, 1.5rem);
@@ -534,10 +534,10 @@ st.markdown("""
          }
      }
      
-     @media (max-width: 768px) {
-         .main > div {
+    @media (max-width: 768px) {
+        .main > div {
              padding: 0.75rem 1rem;
-         }
+        }
          
          .metric-card {
              margin: 0.25rem 0;
@@ -578,7 +578,7 @@ st.markdown("""
          
          .chart-container {
              padding: 0.75rem;
-             margin: 0.5rem 0;
+            margin: 0.5rem 0;
          }
          
                    .stColumn > div {
@@ -675,8 +675,8 @@ st.markdown("""
           
           .element-container img {
               max-width: 50px !important;
-          }
-     }
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -756,8 +756,8 @@ def create_metric_card(title, value, delta=None, icon="📊", color="blue"):
             <div class="metric-title">{title}</div>
         </div>
         <div>
-            <div class="metric-value">{value}</div>
-            {delta_html}
+        <div class="metric-value">{value}</div>
+        {delta_html}
         </div>
     </div>
     """, unsafe_allow_html=True)
