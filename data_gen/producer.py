@@ -18,21 +18,21 @@ from kafka import KafkaProducer
 
 # Import generators with error handling
 try:
-from data_gen.generators import (
-    generate_ft_flight, generate_ft_passenger, generate_ft_booking, generate_ft_baggage,
-    generate_ft_crew_assignment, generate_ft_passenger_notification, generate_ft_flight_incident,
-    generate_ft_passenger_feedback, generate_ft_flight_fuel, generate_ft_maintenance_event
-)
-from data_gen.config import (
-    KAFKA_BROKER,
-    KAFKA_TOPIC_FLIGHT, KAFKA_TOPIC_PASSENGER, KAFKA_TOPIC_BOOKING, KAFKA_TOPIC_BAGGAGE,
-    KAFKA_TOPIC_CREW_ASSIGNMENT, KAFKA_TOPIC_PASSENGER_NOTIFICATION, KAFKA_TOPIC_FLIGHT_INCIDENT,
-    KAFKA_TOPIC_PASSENGER_FEEDBACK, KAFKA_TOPIC_FLIGHT_FUEL, KAFKA_TOPIC_MAINTENANCE_EVENT,
-    BATCH_SIZE_FLIGHT, BATCH_SIZE_PASSENGER, BATCH_SIZE_BOOKING, BATCH_SIZE_BAGGAGE,
-    BATCH_SIZE_CREW_ASSIGNMENT, BATCH_SIZE_PASSENGER_NOTIFICATION, BATCH_SIZE_FLIGHT_INCIDENT,
-    BATCH_SIZE_PASSENGER_FEEDBACK, BATCH_SIZE_FLIGHT_FUEL, BATCH_SIZE_MAINTENANCE_EVENT,
-    PRODUCE_INTERVAL_SECONDS
-)
+    from data_gen.generators import (
+        generate_ft_flight, generate_ft_passenger, generate_ft_booking, generate_ft_baggage,
+        generate_ft_crew_assignment, generate_ft_passenger_notification, generate_ft_flight_incident,
+        generate_ft_passenger_feedback, generate_ft_flight_fuel, generate_ft_maintenance_event
+    )
+    from data_gen.config import (
+        KAFKA_BROKER,
+        KAFKA_TOPIC_FLIGHT, KAFKA_TOPIC_PASSENGER, KAFKA_TOPIC_BOOKING, KAFKA_TOPIC_BAGGAGE,
+        KAFKA_TOPIC_CREW_ASSIGNMENT, KAFKA_TOPIC_PASSENGER_NOTIFICATION, KAFKA_TOPIC_FLIGHT_INCIDENT,
+        KAFKA_TOPIC_PASSENGER_FEEDBACK, KAFKA_TOPIC_FLIGHT_FUEL, KAFKA_TOPIC_MAINTENANCE_EVENT,
+        BATCH_SIZE_FLIGHT, BATCH_SIZE_PASSENGER, BATCH_SIZE_BOOKING, BATCH_SIZE_BAGGAGE,
+        BATCH_SIZE_CREW_ASSIGNMENT, BATCH_SIZE_PASSENGER_NOTIFICATION, BATCH_SIZE_FLIGHT_INCIDENT,
+        BATCH_SIZE_PASSENGER_FEEDBACK, BATCH_SIZE_FLIGHT_FUEL, BATCH_SIZE_MAINTENANCE_EVENT,
+        PRODUCE_INTERVAL_SECONDS
+    )
     print("[Producer] ✅ Import işlemleri başarılı")
 except ImportError as e:
     print(f"[Producer] ❌ Import hatası: {e}")
