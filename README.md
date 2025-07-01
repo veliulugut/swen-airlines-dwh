@@ -128,45 +128,54 @@ docker compose up -d
 
 ### 📊 Proje Hakkında
 
-Swen Airlines Veri Ambarı, modern bir havayolu şirketinin operasyonel ihtiyaçlarını karşılayan tam otomatik, gerçek zamanlı iş zekâsı platformudur. Sistem; uçuş operasyonları, yolcu hizmetleri, gelir analizi ve ekip yönetimi gibi tüm süreçleri izler ve analiz eder.
+Swen Airlines Veri Ambarı projesi, modern bir havayolu şirketinin karmaşık operasyonel ihtiyaçlarını karşılamak üzere tasarlanmış tam otomatik, gerçek zamanlı iş zekâsı platformudur. Bu sistem, uçuş operasyonlarından yolcu hizmetlerine, gelir analizinden ekip yönetimine kadar tüm operasyonel süreçleri izler ve analiz eder.
 
-Günde binlerce uçuş ve milyonlarca yolcu verisini anlık işleyerek, karar vericilere kritik operasyonel bilgiler sunar.
+Proje, kurumsal seviyede veri işleme kapasitesi ile binlerce uçuş, milyonlarca yolcu ve karmaşık operasyonel verileri anlık olarak işleyebilmektedir. Sistem, karar vericilere kritik operasyonel içgörüler sağlayarak havayolu operasyonlarının verimliliğini en üst düzeye çıkarmayı hedeflemektedir.
 
 ### 🏗️ Sistem Mimarisi
 
-**3 Katmanlı Veri Ambarı:**
-- **FT Katmanı**: Ham verinin Kafka'dan geldiği ilk durak
-- **STR Katmanı**: Verinin temizlendiği ve zenginleştirildiği katman  
-- **TR Katmanı**: Raporlama için hazır, toplanmış verilerin katmanı
+#### 3 Katmanlı Veri Ambarı Mimarisi
 
-**Veri Akışı:** Kafka Producer → PostgreSQL (FT) → Airflow ETL → STR → TR → Streamlit Dashboard
+Sistem, modern veri ambarı prensiplerine uygun olarak 3 ana katmanda tasarlanmıştır:
 
-### ⚡ Otomatik Veri Akışı
+```
+┌─────────────────┐    ┌──────────────┐    ┌─────────────────┐
+│   Veri Kaynakları│───▶│    Kafka     │───▶│   FT Katmanı    │
+│ (Gerçek Zamanlı) │    │ (Streaming)  │    │ (Fact Tables)   │
+│                 │    │              │    │                 │
+│ • Uçuş Ops      │    │ • Konu Tabanlı│    │ • Ham Veri      │
+│ • Rezervasyonlar│    │ • Bölümlenmiş │    │ • Zaman Damgalı │
+│ • Yolcular      │    │ • Ölçeklenebilir│    │ • Denetim İzi   │
+│ • Ekip          │    │              │    │                 │
+│ • Bagaj         │    │              │    │                 │
+└─────────────────┘    └──────────────┘    └─────────────────┘
+                                                    │
+                                                    ▼
+┌─────────────────┐    ┌──────────────┐    ┌─────────────────┐
+│   Dashboard     │◀───│  TR Katmanı  │◀───│   STR Katmanı   │
+│  (Streamlit)    │    │ (Raporlar)   │    │ (Staging)       │
+│                 │    │              │    │                 │
+│ • Yönetici      │    │ • Toplanmış  │    │ • Temizlenmiş   │
+│ • Operasyonlar  │    │ • KPI'lar    │    │ • İş Kuralları  │
+│ • Gelir         │    │ • Metrikler  │    │ • Zenginleştirilmiş│
+│ • Yolcular      │    │ • Trendler   │    │ • Doğrulanmış   │
+│ • Uçaklar       │    │              │    │                 │
+└─────────────────┘    └──────────────┘    └─────────────────┘
+                                                    ▲
+                                                    │
+                       ┌──────────────────────────────────┐
+                       │        Airflow ETL              │
+                       │    (SQL Prosedürleri)           │
+                       │                                  │
+                       │ • FT → STR (her 5 dakika)      │
+                       │ • STR → TR (her 3 dakika)       │
+                       │ • Delta İşleme                  │
+                       │ • Hata Yönetimi                 │
+                       │ • Veri Kalitesi Kontrolleri     │
+                       └──────────────────────────────────┘
+```
 
-1. **Veri Üretimi**: Kafka Producer 7/24 gerçek zamanlı veri üretir
-2. **Veri Toplama**: Airflow her 5 dakikada Kafka'dan PostgreSQL'e veri aktarır  
-3. **Veri Dönüşümü**: Her 3 dakikada SQL prosedürleri ile temizleme ve zenginleştirme
-4. **Raporlama**: Streamlit ile anlık dashboard'lar
-
-### 📱 Dashboard'lar
-
-**7 Özelleşmiş Analitik Paneli:**
-
-| Panel | Açıklama | Hedef Kitle |
-|-------|----------|-------------|
-| 🎯 **Yönetici** | KPI'lar, finansal özetler, genel performans | Üst Yönetim |
-| ✈️ **Operasyon** | Uçuş durumları, gecikme analizi, kapasite | Operasyon Ekipleri |
-| 💰 **Gelir** | Fiyatlandırma, kârlılık, pazar analizi | Revenue Management |
-| 👥 **Yolcu** | Müşteri segmentasyonu, memnuniyet, sadakat | CX Ekipleri |
-| 👨‍✈️ **Ekip** | Personel kullanımı, performans, uyumluluk | HR & Crew Planning |
-| 🧳 **Bagaj** | Bagaj operasyonları, kayıp önleme | Ground Operations |
-| 🛬 **Uçak** | Filo performansı, bakım, yakıt verimliliği | Fleet Management |
-
-![Dashboard Screenshots](screenshot/dashboard_1.png)
-
-### 🚀 Kurulum
-
-**Gereksinimler:** Docker, 8GB RAM, 20GB Disk
+### 🚀 Hızlı Başlangıç
 
 ```bash
 git clone https://github.com/yourusername/swen-airlines-dwh.git
@@ -174,33 +183,36 @@ cd swen-airlines-dwh
 docker compose up -d
 ```
 
-**Erişim:**
-- 📊 **Dashboard**: http://localhost:8501
-- ⚙️ **Airflow**: http://localhost:8080 (admin/admin)
-- 🗄️ **PostgreSQL**: localhost:5432 (admin/admin)
+### 📱 Erişim Noktaları
+- **📊 Analitik Dashboard**: http://localhost:8501
+- **⚙️ Airflow Arayüzü**: http://localhost:8080 (admin/admin)
+- **🗄️ PostgreSQL**: localhost:5432 (admin/admin)
+
+### 🎯 Temel Özellikler
+- **Gerçek Zamanlı Veri İşleme**: Kafka tabanlı streaming mimarisi
+- **Otomatik ETL**: SQL prosedürleri ile Airflow orkestrayonu
+- **7 Özelleşmiş Dashboard**: Yönetici, Operasyonlar, Gelir, Yolcular, Ekip, Bagaj, Uçak
+- **3 Katmanlı Mimari**: FT (Ham) → STR (Temizlenmiş) → TR (Raporlar)
+- **Kurumsal Seviye**: Ölçeklenebilir, hata toleranslı, izleme hazır
+
+### 📊 Dashboard Galerisi
+![Yönetici Dashboard](screenshot/dashboard_1.png)
+![Operasyonlar](screenshot/flight_operation.png)
+![Gelir Analitikleri](screenshot/revenue.png)
+![Yolcu Deneyimi](screenshot/passenger.png)
 
 ### 🛠️ Teknoloji Yığını
-
 - **Streaming**: Apache Kafka + Zookeeper
-- **Orchestration**: Apache Airflow  
-- **Database**: PostgreSQL
-- **Analytics**: Streamlit + Plotly
+- **Orkestrasyon**: Apache Airflow
+- **Veritabanı**: PostgreSQL
+- **Analitik**: Streamlit + Plotly
 - **Deployment**: Docker + Docker Compose
 
 ### 📈 İş Etkisi
-
-- **%30 Daha Hızlı Karar Verme**
-- **%25 Maliyet Azaltma** 
-- **%40 Müşteri Memnuniyeti Artışı**
-- **%20 Gelir Artışı**
-
-### 🎯 Proje Özellikleri
-
-- ✅ **Tam Otomatik**: Manuel müdahale gerektirmez
-- ✅ **Gerçek Zamanlı**: 3-5 dakika veri tazeliği
-- ✅ **Ölçeklenebilir**: Büyük veri hacimlerine uygun
-- ✅ **Enterprise**: Kurumsal seviye güvenlik ve monitoring
-- ✅ **Modern UI**: Responsive dashboard tasarımı
+- **%30 Daha Hızlı Karar Verme** gerçek zamanlı içgörüler sayesinde
+- **%25 Maliyet Azaltma** kaynak optimizasyonu ile
+- **%40 Müşteri Memnuniyeti Artışı** proaktif hizmet ile
+- **%20 Gelir Artışı** dinamik fiyatlandırma sayesinde
 
 ---
 
